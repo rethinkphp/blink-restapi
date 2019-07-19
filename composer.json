@@ -9,7 +9,9 @@
             "email": "bixuehujin@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "rethink/typedphp": "dev-master"
+    },
     "autoload": {
         "psr-4": {
             "blink\\restapi\\": "src"
