@@ -23,6 +23,7 @@ class BuildDocsCommand extends \blink\core\console\Command
     public $apiNamespace;
     public $apiPath;
     public $docsTemplatePath;
+    public $typeParserFactory;
 
     public function configure()
     {
@@ -56,7 +57,12 @@ class BuildDocsCommand extends \blink\core\console\Command
 
     protected function buildDocs($apiClasses)
     {
-        $generator = new DocGenerator($apiClasses);
+        $parser = null;
+        if ($this->typeParserFactory) {
+            $parser = ($this->typeParserFactory)();
+        }
+
+        $generator = new DocGenerator($apiClasses, $parser);
         $segments = $generator->generate();
 
         $docs = Json::decode(file_get_contents($this->docsTemplatePath));
