@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "rethink/typedphp": "dev-master"
+        "rethink/typedphp": "dev-master",
+        "symfony/var-exporter": "^4.3"
     },
     "autoload": {
         "psr-4": {

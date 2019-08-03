@@ -6,6 +6,7 @@ use blink\core\InvalidConfigException;
 use blink\restapi\RouteGenerator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * Class BuildRoutesCommand
@@ -35,7 +36,7 @@ class BuildRoutesCommand extends \blink\core\console\Command
 
     protected function writeRoutes($path, array $routes)
     {
-        $content = $this->exportVar($routes);
+        $content = VarExporter::export($routes);
         $content = <<<ROUTES
 <?php
 /**
@@ -45,17 +46,5 @@ return $content;
 ROUTES;
 
         file_put_contents($path, $content);
-    }
-
-    protected function exportVar($expression)
-    {
-        $export = var_export($expression, TRUE);
-
-        $export = preg_replace("/^([ ]*)(.*)/m", '$1$1$2', $export);
-        $array = preg_split("/\r\n|\n|\r/", $export);
-        $array = preg_replace(["/\s*array\s\($/", "/\)(,)?$/", "/\s=>\s$/"], [NULL, ']$1', ' => ['], $array);
-        $export = join(PHP_EOL, array_filter(["["] + $array));
-
-        return $export;
     }
 }
