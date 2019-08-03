@@ -31,8 +31,12 @@ class RouteGenerator extends BaseObject
             }
 
             $group = substr($item->getPath(), strlen($path) + 1);
-
-            $class = '\\' . $namespace . '\\' . str_replace('/', '\\', $group) . '\\' .  $item->getBasename('.php');
+            
+            if ($group) {
+                $class = '\\' . $namespace . '\\' . str_replace('/', '\\', $group) . '\\' .  $item->getBasename('.php');
+            } else {
+                $class = '\\' . $namespace . '\\' .  $item->getBasename('.php');
+            }
 
             // TODO check this verb and path
 
