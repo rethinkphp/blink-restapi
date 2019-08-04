@@ -6,6 +6,7 @@ use blink\core\BaseObject;
 use blink\support\Json;
 use rethink\typedphp\DocGenerator;
 use blink\core\InvalidConfigException;
+use rethink\typedphp\TypeParser;
 use Symfony\Component\VarExporter\VarExporter;
 
 /**
@@ -93,10 +94,7 @@ ROUTES;
             throw new InvalidConfigException('The configuration: templatePath is not configured');
         }
 
-        $parser = null;
-        if ($this->typeParserFactory) {
-            $parser = ($this->typeParserFactory)();
-        }
+        $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_REF_SCHEMA);
 
         $generator = new DocGenerator($this->getApiClasses(), $parser);
         $segments = $generator->generate();
@@ -135,5 +133,20 @@ ROUTES;
         }
 
         return $path;
+    }
+
+    /**
+     * Create a new TypeParser.
+     *
+     * @param int $mode
+     * @return TypeParser
+     */
+    public function makeTypeParser($mode): TypeParser
+    {
+        if ($this->typeParserFactory)  {
+            return ($this->typeParserFactory)($mode);
+        } else {
+            return new TypeParser($mode);
+        }
     }
 }
