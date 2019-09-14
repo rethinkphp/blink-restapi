@@ -43,7 +43,11 @@ class ResponseValidator extends BaseObject implements MiddlewareContract {
 
         $validator = new TypeValidator();
         if (!$validator->validate($data, $definition)) {
-            throw new HttpException(500, "Response schema validation failed: " . Json::encode($validator->getErrors()));
+            throw new HttpException(500, sprintf(
+                "Response schema validation failed. error: %s, response data: %s",
+                Json::encode($validator->getErrors()),
+                Json::encode($data)
+            ));
         }
     }
 }
