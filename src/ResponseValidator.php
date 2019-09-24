@@ -28,8 +28,15 @@ class ResponseValidator extends BaseObject implements MiddlewareContract {
         $responses = $this->responses;
         $code = $response->getStatusCode();
 
-        if (!isset($responses[$code])) {
+        if (! array_key_exists($code, $responses)) {
             throw new HttpException(500, "The response schema of status code: $code is not defined");
+        }
+
+        if ($responses[$code] === null) {
+            if ($response->data !== null) {
+                throw new HttpException(500, "The response of status code: $code is incorrect, no response body required");
+            }
+            return;
         }
 
         $data = $response->data;
