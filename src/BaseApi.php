@@ -75,12 +75,24 @@ abstract class BaseApi implements ApiInterface
             return;
         }
 
+        if ($this->isMultipartFormDataRequest($request)) {
+            return;
+        }
+
         $definition = app()->restapi->makeTypeParser(TypeParser::MODE_JSON_SCHEMA)->parse($body);
 
         $validator = new TypeValidator();
         if (!$validator->validate($request->payload->all(), $definition)) {
             return $this->badRequest($validator->getErrors()[0]);
         }
+    }
+
+    private function isMultipartFormDataRequest(Request $request)
+    {
+        // possible value: multipart/form-data; boundary=------------------------f80f7f383827c25b
+        $requestedContentType = $request->headers->first('content-type');
+
+        return strpos($requestedContentType, 'multipart/form-data') !== false;
     }
 
     protected function defaultResponses()
