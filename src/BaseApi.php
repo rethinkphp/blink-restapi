@@ -6,7 +6,6 @@ use blink\http\Request;
 use blink\http\Response;
 use rethink\typedphp\ApiInterface;
 use rethink\typedphp\InputValidator;
-use rethink\typedphp\types\FileProductType;
 use rethink\typedphp\TypeValidator;
 use rethink\typedphp\TypeParser;
 use blink\core\HttpException;
@@ -90,11 +89,10 @@ abstract class BaseApi implements ApiInterface
 
     private function isMultipartFormDataRequest(Request $request)
     {
-        $contentType = FileProductType::contentType();
         // possible value: multipart/form-data; boundary=------------------------f80f7f383827c25b
         $requestedContentType = $request->headers->first('content-type');
 
-        return strpos($requestedContentType, $contentType) !== false;
+        return strpos($requestedContentType, 'multipart/form-data') !== false;
     }
 
     protected function defaultResponses()
