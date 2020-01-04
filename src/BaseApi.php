@@ -33,10 +33,14 @@ abstract class BaseApi implements ApiInterface
 
     public function before($action)
     {
-        if ($this->schemaValidation && app()->environment !== 'prod') {
-            $this->validateParameters($this->request);
-            $this->validateRequestBody($this->request);
+        if (! $this->schemaValidation) {
+            return;
+        }
 
+        $this->validateParameters($this->request);
+        $this->validateRequestBody($this->request);
+
+        if (app()->environment !== 'prod') {
             $this->response->middleware([
                 'class' => ResponseValidator::class,
                 'responses' => static::responses() + $this->defaultResponses(),
@@ -67,6 +71,7 @@ abstract class BaseApi implements ApiInterface
         $validData = $validator->getData();
 
         $request->params->add($validData['query'] ?? []);
+        $request->setAttribute('routing', $validData['path'] ?? []);
     }
 
     protected function validateRequestBody(Request $request)
