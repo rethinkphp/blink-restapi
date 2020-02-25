@@ -12,8 +12,7 @@ use blink\core\PluginContract;
  */
 class Plugin implements PluginContract
 {
-    public $apiNamespace;
-    public $apiPath;
+    public $apiPaths;
     public $templatePath;
     public $routePath;
 
@@ -26,8 +25,7 @@ class Plugin implements PluginContract
     {
         $app->bind('restapi', [
             'class' => Manager::class,
-            'apiNamespace' => $this->apiNamespace,
-            'apiPath' => $this->apiPath,
+            'apiPaths' => $this->apiPaths,
             'templatePath' => $this->templatePath,
             'routePath' => $this->routePath,
             'typeParserFactory' => $this->typeParserFactory,

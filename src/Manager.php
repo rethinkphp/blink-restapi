@@ -16,13 +16,11 @@ use Symfony\Component\VarExporter\VarExporter;
  */
 class Manager extends BaseObject
 {
-    public $apiNamespace;
-    public $apiPath;
+    public $apiPaths = [];
     public $templatePath;
     public $routePath;
 
     public $typeParserFactory;
-
 
     /**
      * Build the routes through the configured namespace and path.
@@ -32,14 +30,14 @@ class Manager extends BaseObject
      */
     public function buildRoutes()
     {
-        if (!$this->apiNamespace || !$this->apiPath) {
-            throw new InvalidConfigException('The configuration: apiNamespace, apiPath, routePath are not configured');
+        if (!$this->apiPaths) {
+            throw new InvalidConfigException('The configuration: apiPaths, routePath are not configured');
         }
 
         $generator = new RouteGenerator();
 
 
-        return $generator->generate($this->apiNamespace, $this->normalizePath($this->apiPath));
+        return $generator->generate($this->normalizePaths($this->apiPaths));
     }
 
     /**
@@ -53,7 +51,7 @@ class Manager extends BaseObject
             throw new InvalidConfigException('The configuration: routePath is not configured');
         }
 
-        $routes = $this->buildRoutes($this->apiNamespace, $this->apiPath);
+        $routes = $this->buildRoutes();
 
         $this->writeRoutes($this->routePath, $routes);
     }
@@ -126,13 +124,15 @@ ROUTES;
         );
     }
 
-    protected function normalizePath($path)
+    protected function normalizePaths($paths)
     {
-        if ($path[0] !== '/') {
-            $path = app()->root . '/' . $path;
-        }
+        return array_map(function ($path) {
+            if ($path[0] !== '/') {
+                $path = app()->root . '/' . $path;
+            }
 
-        return $path;
+            return $path;
+        }, $paths);
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace blink\restapi;
 
 use blink\core\BaseObject;
+use rethink\typedphp\ApiInterface;
+use ReflectionClass;
 
 /**
  * Class RouteGenerator
@@ -11,36 +13,53 @@ use blink\core\BaseObject;
  */
 class RouteGenerator extends BaseObject
 {
-    /**
-     * Generate routes for given namespace and api path.
-     *
-     * @param $namespace
-     * @param $path
-     * @return array
-     */
-    public function generate($namespace, $path)
+    protected function requireFiles(string $path)
     {
         $iter = new \RecursiveDirectoryIterator($path);
-        $path = realpath($path);
 
-        $routes = [];
         /** @var \SplFileInfo $item */
         foreach (new \RecursiveIteratorIterator($iter) as $item) {
             if (in_array($item->getFilename(), ['.', '..'])) {
                 continue;
             }
 
-            $group = substr($item->getPath(), strlen($path) + 1);
-            
-            if ($group) {
-                $class = '\\' . $namespace . '\\' . str_replace('/', '\\', $group) . '\\' .  $item->getBasename('.php');
-            } else {
-                $class = '\\' . $namespace . '\\' .  $item->getBasename('.php');
+            if ($item->getExtension() === 'php') {
+                require_once $item->getRealPath();
+            }
+        }
+    }
+
+    /**
+     * Generate routes for given namespace and api path.
+     *
+     * @param $paths
+     * @return array
+     */
+    public function generate($paths)
+    {
+        array_walk($paths, [$this, 'requireFiles']);
+
+        $classes = get_declared_classes();
+
+        $routes = [];
+
+        foreach ($classes as $class) {
+            if (! is_subclass_of($class, ApiInterface::class)) {
+                continue;
+            }
+
+            try {
+                $reflection = new ReflectionClass($class);
+                if ($reflection->isAbstract()) {
+                    continue;
+                }
+            } catch (\ReflectionException $e) {
+                // this should never happen
+                continue;
             }
 
             // TODO check this verb and path
-
-            $routes[] = [$class::$verb, $class::$path, $class . '@run'];
+            $routes[] = [$class::$verb, $class::$path, '\\'. $class . '@run'];
         }
 
         return $routes;
