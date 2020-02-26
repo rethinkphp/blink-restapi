@@ -62,6 +62,21 @@ class RouteGenerator extends BaseObject
             $routes[] = [$class::$verb, $class::$path, '\\'. $class . '@run'];
         }
 
-        return $routes;
+        return $this->sort($routes);
     }
+
+    private function sort(array $routes)
+    {
+        $wildcard = [];
+        $res = [];
+        foreach ($routes as $route) {
+            if (preg_match('/{\w*?}/', $route[1])) {
+                $wildcard[] = $route;
+            } else {
+                $res[] = $route;
+            }
+        }
+        return array_merge($res, $wildcard);
+    }
+
 }
