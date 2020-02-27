@@ -97,7 +97,7 @@ ROUTES;
         $generator = new DocGenerator($this->getApiClasses(), $parser);
         $segments = $generator->generate();
 
-        $content = file_get_contents($this->normalizePath($this->templatePath));
+        $content = file_get_contents($this->normalizePaths([$this->templatePath])[0]);
 
         $docs = Json::decode($content);
 
@@ -123,7 +123,7 @@ ROUTES;
             Json::encode($docs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
     }
-
+    
     protected function normalizePaths($paths)
     {
         return array_map(function ($path) {
