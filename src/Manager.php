@@ -97,7 +97,7 @@ ROUTES;
         $generator = new DocGenerator($this->getApiClasses(), $parser);
         $segments = $generator->generate();
 
-        $content = file_get_contents($this->normalizePaths([$this->templatePath])[1]);
+        $content = file_get_contents($this->normalizePaths([$this->templatePath])[0]);
 
         $docs = Json::decode($content);
 
