@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "rethink/typedphp": "dev-master",
+        "rethink/typedphp": "dev-forced-typehint",
         "symfony/var-exporter": "^4.3"
     },
     "autoload": {
