@@ -17,10 +17,6 @@ use blink\core\HttpException;
  */
 abstract class BaseApi implements ApiInterface
 {
-    public static $op;
-    public static $path;
-    public static $verb;
-
     protected $schemaValidation = true;
     protected $request;
     protected $response;
