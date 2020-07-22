@@ -83,16 +83,23 @@ ROUTES;
     /**
      * Build the docs through the configurations.
      *
+     * @param string $version
      * @return array
      * @throws InvalidConfigException
      */
-    public function buildDocs()
+    public function buildDocs($version = '')
     {
         if (!$this->templatePath) {
             throw new InvalidConfigException('The configuration: templatePath is not configured');
         }
-
-        $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_REF_SCHEMA);
+        
+        $version = $version ?: '3.0';
+        
+        if ($version === '3.1') {
+            $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_OPEN_API_31 | TypeParser::MODE_REF_SCHEMA);
+        } else {
+            $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_REF_SCHEMA);
+        }
 
         $generator = new DocGenerator($this->getApiClasses(), $parser);
         $segments = $generator->generate();
@@ -100,6 +107,13 @@ ROUTES;
         $content = file_get_contents($this->normalizePaths([$this->templatePath])[0]);
 
         $docs = Json::decode($content);
+        
+        if ($version === '3.1') {
+            $docs['openapi'] = '3.1.0-rc0';
+        } else {
+            $docs['openapi'] = '3.0.2';
+        }
+        $docs['info']['version'] = $version;
 
         $docs['components']['schemas'] = $segments['schemas'];
         $docs['paths'] = $segments['paths'];
@@ -112,11 +126,12 @@ ROUTES;
      * Build the docs and save it to the specified path.
      *
      * @param string $path
+     * @param string $version
      * @throws InvalidConfigException
      */
-    public function generateDocs($path)
+    public function generateDocs($path, $version = '')
     {
-        $docs = $this->buildDocs();
+        $docs = $this->buildDocs($version);
 
         file_put_contents(
             $path,

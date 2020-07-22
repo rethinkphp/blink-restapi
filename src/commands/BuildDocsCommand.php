@@ -2,11 +2,13 @@
 
 namespace blink\restapi\commands;
 
+use blink\restapi\Manager;
 use blink\restapi\RouteGenerator;
 use blink\support\Json;
 use rethink\typedphp\DocGenerator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use blink\core\InvalidConfigException;
 
@@ -23,12 +25,17 @@ class BuildDocsCommand extends \blink\core\console\Command
     public function configure()
     {
         $this->addArgument('dst', InputArgument::REQUIRED, 'The path to generate into.');
+        $this->addOption('ver', null, InputOption::VALUE_REQUIRED, 'The openapi version', '');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $dst = $input->getArgument('dst');
+        $ver = $input->getOption('ver');
+        
+        /** @var Manager $manager */
+        $manager = $this->blink->get('restapi');
 
-        $this->blink->get('restapi')->generateDocs($dst);
+        $manager->generateDocs($dst, $ver);
     }
 }
