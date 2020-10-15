@@ -67,7 +67,7 @@ class Manager extends BaseObject
 return $content;
 ROUTES;
 
-        file_put_contents($path, $content);
+        file_put_contents($path, $content . "\n");
     }
 
     protected function getApiClasses()
@@ -135,7 +135,7 @@ ROUTES;
 
         file_put_contents(
             $path,
-            Json::encode($docs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+            Json::encode($docs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . "\n"
         );
     }
     
