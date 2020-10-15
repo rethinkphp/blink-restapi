@@ -71,13 +71,12 @@ class RouteGenerator extends BaseObject
             $parts1 = explode('/', $route1[1]);
             $parts2 = explode('/', $route2[1]);
             
-            if (count($parts1) != count($parts2)) {
-                return count($parts1) <=> count($parts2);
-            }
+            $maxCount = max(count($parts1), count($parts2));
             
-            foreach ($parts1 as $i => $a) {
-                $b = $parts2[$i];
-
+            for ($i=0; $i<$maxCount; $i++) {
+                $a = $parts1[$i] ?? null;
+                $b = $parts2[$i] ?? null;
+                
                 if ($a === $b) {
                     // noop
                 } elseif ($a === null) {
