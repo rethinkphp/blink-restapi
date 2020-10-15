@@ -67,16 +67,34 @@ class RouteGenerator extends BaseObject
 
     private function sort(array $routes)
     {
-        $wildcard = [];
-        $res = [];
-        foreach ($routes as $route) {
-            if (preg_match('/{\w*?}/', $route[1])) {
-                $wildcard[] = $route;
-            } else {
-                $res[] = $route;
+        usort($routes, function ($route1, $route2) {
+            $parts1 = explode('/', $route1[1]);
+            $parts2 = explode('/', $route2[1]);
+            
+            if (count($parts1) != count($parts2)) {
+                return count($parts1) <=> count($parts2);
             }
-        }
-        return array_merge($res, $wildcard);
+            
+            foreach ($parts1 as $i => $a) {
+                $b = $parts2[$i];
+
+                if ($a === $b) {
+                    // noop
+                } elseif ($a === null) {
+                    return -1;
+                } elseif ($b === null) {
+                    return 1;
+                } elseif (preg_match('/^{\w*?}$/', $a)) {
+                    return 1;
+                } else {
+                    return $a <=> $b;
+                }
+            }
+            
+            return 0;
+        });
+        
+        return $routes;
     }
 
 }
