@@ -41,13 +41,16 @@ abstract class BaseApi implements ApiInterface
             $this->response->middleware([
                 'class' => ResponseValidator::class,
                 'responses' => static::responses() + $this->defaultResponses(),
+                'schemaParser' => function (int $mode, $schema) {
+                    return $this->parseSchema($mode, $schema);
+                }
             ]);
         }
     }
 
     protected function validateParameters(Request $request)
     {
-        if (!($parameters = static::parameters())) {
+        if (! ($parameters = static::parameters())) {
             return;
         }
 
@@ -59,9 +62,9 @@ abstract class BaseApi implements ApiInterface
             'query' => $queryParams,
         ]);
 
-        $parameters = app()->restapi->makeTypeParser(TypeParser::MODE_JSON_SCHEMA)->parse($parameters);
+        $parameters = $this->parseSchema(TypeParser::MODE_JSON_SCHEMA, $parameters);
 
-        if(!$validator->validate($parameters)) {
+        if (! $validator->validate($parameters)) {
             return $this->badRequest($validator->getErrors()[0]);
         }
 
@@ -73,7 +76,7 @@ abstract class BaseApi implements ApiInterface
 
     protected function validateRequestBody(Request $request)
     {
-        if (!($body = static::requestBody())) {
+        if (! ($body = static::requestBody())) {
             return;
         }
 
@@ -81,12 +84,23 @@ abstract class BaseApi implements ApiInterface
             return;
         }
 
-        $definition = app()->restapi->makeTypeParser(TypeParser::MODE_JSON_SCHEMA)->parse($body);
+        $definition = $this->parseSchema(TypeParser::MODE_JSON_SCHEMA, $body);
 
         $validator = new TypeValidator();
-        if (!$validator->validate($request->payload->all(), $definition)) {
+        if (! $validator->validate($request->payload->all(), $definition)) {
             return $this->badRequest($validator->getErrors()[0]);
         }
+    }
+
+
+    /**
+     * @param int $mode
+     * @param string|array $schema
+     * @return array
+     */
+    protected function parseSchema(int $mode, $schema): array
+    {
+        return app()->restapi->makeTypeParser($mode)->parse($schema);
     }
 
     private function isMultipartFormDataRequest(Request $request)
