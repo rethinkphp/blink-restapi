@@ -95,7 +95,7 @@ abstract class BaseApi implements ApiInterface
 
     /**
      * @param int $mode
-     * @param string|array $schema
+     * @param string|array|object $schema
      * @return array
      */
     protected function parseSchema(int $mode, $schema): array
