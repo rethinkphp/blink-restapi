@@ -3,8 +3,8 @@
 namespace blink\restapi;
 
 use blink\core\BaseObject;
-use blink\core\MiddlewareContract;
 use blink\core\HttpException;
+use blink\core\MiddlewareContract;
 use blink\http\Response;
 use blink\support\Json;
 use rethink\typedphp\TypeParser;
@@ -18,6 +18,10 @@ use rethink\typedphp\TypeValidator;
 class ResponseValidator extends BaseObject implements MiddlewareContract {
 
     public $responses = [];
+    /**
+     * @var callable
+     */
+    public $schemaParser;
 
     /**
      * @param Response $response
@@ -46,7 +50,7 @@ class ResponseValidator extends BaseObject implements MiddlewareContract {
             $data = Json::decode(Json::encode($data));
         }
 
-        $definition = app()->restapi->makeTypeParser(TypeParser::MODE_JSON_SCHEMA)->parse($responses[$code]);
+        $definition = ($this->schemaParser)(TypeParser::MODE_JSON_SCHEMA, $responses[$code]);
 
         $validator = new TypeValidator();
         if (!$validator->validate($data, $definition)) {
