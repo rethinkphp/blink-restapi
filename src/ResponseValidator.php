@@ -46,7 +46,7 @@ class ResponseValidator extends BaseObject implements MiddlewareContract {
         $data = $response->data;
         if ($data === null) {
             $body = (string)$response->getBody();
-            if (empty($body) {
+            if (empty($body)) {
                 $data = null;
             } else {
                 $data = Json::decode($body);
