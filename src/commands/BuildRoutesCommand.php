@@ -21,5 +21,7 @@ class BuildRoutesCommand extends \blink\core\console\Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->blink->get('restapi')->generateRoutes();
+
+        return 0;
     }
 }

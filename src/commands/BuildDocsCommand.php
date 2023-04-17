@@ -50,5 +50,7 @@ class BuildDocsCommand extends \blink\core\console\Command
         }
 
         $manager->generateDocs($dst, $ver);
+
+        return 0;
     }
 }
