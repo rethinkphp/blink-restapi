@@ -42,7 +42,7 @@ abstract class BaseApi implements ApiInterface
                 'class' => ResponseValidator::class,
                 'responses' => static::responses() + $this->defaultResponses(),
                 'schemaParser' => function (int $mode, $schema) {
-                    return $this->parseSchema($mode, $schema);
+                    return $this->parseSchema($mode, $schema, true);
                 }
             ]);
         }
@@ -86,21 +86,30 @@ abstract class BaseApi implements ApiInterface
 
         $definition = $this->parseSchema(TypeParser::MODE_JSON_SCHEMA, $body);
 
+
         $validator = new TypeValidator();
         if (! $validator->validate($request->payload->all(), $definition)) {
             return $this->badRequest($validator->getErrors()[0]);
         }
     }
 
-
     /**
      * @param int $mode
      * @param string|array|object $schema
+     * @param bool $withSharedSchemas
      * @return array
      */
-    protected function parseSchema(int $mode, $schema): array
+    protected function parseSchema(int $mode, $schema, bool $withSharedSchemas = false): array
     {
-        return app()->restapi->makeTypeParser($mode)->parse($schema);
+        /** @var TypeParser $parser */
+        $parser = app()->restapi->makeTypeParser($mode);
+
+        $result = $parser->parse($schema);
+        if ($withSharedSchemas) {
+            $result['components']['schemas'] = $parser->getSchemas();
+        }
+
+        return $result;
     }
 
     private function isMultipartFormDataRequest(Request $request)
