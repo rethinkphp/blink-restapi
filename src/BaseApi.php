@@ -29,13 +29,13 @@ abstract class BaseApi implements ApiInterface
 
     public function before($action)
     {
-
         $this->validateParameters($this->request);
-        $this->validateRequestBody($this->request);
 
         if (! $this->request->params->boolean('schema_validation', $this->schemaValidation)) {
             return;
         }
+
+        $this->validateRequestBody($this->request);
 
         if (app()->environment !== 'prod') {
             $this->response->middleware([
