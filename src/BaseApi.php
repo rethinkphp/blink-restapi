@@ -27,38 +27,43 @@ abstract class BaseApi implements ApiInterface
         $this->response = $response;
     }
 
-    public function before($action)
+    public function validateRequest(array $routeParameters = []): array
     {
+        $validatedParameters = $this->validateParameters($this->request, $routeParameters);
 
-        $this->validateParameters($this->request);
-        $this->validateRequestBody($this->request);
-
-        if (! $this->request->params->boolean('schema_validation', $this->schemaValidation)) {
-            return;
+        if ($this->request->params->boolean('schema_validation', $this->schemaValidation)) {
+            $this->validateRequestBody($this->request);
         }
 
-        if (app()->environment !== 'prod') {
-            $this->response->middleware([
-                'class' => ResponseValidator::class,
-                'responses' => static::responses() + $this->defaultResponses(),
-                'schemaParser' => function (int $mode, $schema) {
-                    return $this->parseSchema($mode, $schema);
-                }
-            ]);
-        }
+        return $validatedParameters;
     }
+//    {
+//
+//        $this->validateParameters($this->request);
+//        $this->validateRequestBody($this->request);
+//
+//
+//        if (config('app.env') !== 'prod') {
+////            $this->response->middleware([
+////                'class' => ResponseValidator::class,
+////                'responses' => static::responses() + $this->defaultResponses(),
+////                'schemaParser' => function (int $mode, $schema) {
+////                    return $this->parseSchema($mode, $schema);
+////                }
+////            ]);
+//        }
+//    }
 
-    protected function validateParameters(Request $request)
+    protected function validateParameters(Request $request,  array $routeParameters = []): array
     {
         if (! ($parameters = static::parameters())) {
-            return;
+            return $routeParameters;
         }
 
-        $routingParams = $request->getAttribute('routing', []);
         $queryParams = $request->params->all();
 
         $validator = new InputValidator([
-            'path' => $routingParams,
+            'path' => $routeParameters,
             'query' => $queryParams,
         ]);
 
@@ -71,7 +76,8 @@ abstract class BaseApi implements ApiInterface
         $validData = $validator->getData();
 
         $request->params->add($validData['query'] ?? []);
-        $request->setAttribute('routing', $validData['path'] ?? []);
+        
+        return $validData['path'] ?? [];
     }
 
     protected function validateRequestBody(Request $request)
@@ -100,7 +106,7 @@ abstract class BaseApi implements ApiInterface
      */
     protected function parseSchema(int $mode, $schema): array
     {
-        return app()->restapi->makeTypeParser($mode)->parse($schema);
+        return app()->get('restapi')->makeTypeParser($mode)->parse($schema);
     }
 
     private function isMultipartFormDataRequest(Request $request)

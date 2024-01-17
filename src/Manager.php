@@ -143,7 +143,7 @@ ROUTES;
     {
         return array_map(function ($path) {
             if ($path[0] !== '/') {
-                $path = app()->root . '/' . $path;
+                $path = config('app.root') . '/' . $path;
             }
 
             return $path;

@@ -2,6 +2,7 @@
 
 namespace blink\restapi\commands;
 
+use blink\di\Container;
 use blink\restapi\Manager;
 use blink\restapi\RouteGenerator;
 use blink\support\Json;
@@ -17,10 +18,10 @@ use blink\core\InvalidConfigException;
  *
  * @package blink\restapi
  */
-class BuildDocsCommand extends \blink\core\console\Command
+class BuildDocsCommand extends \blink\console\Command
 {
-    public $name = 'restapi:build-docs';
-    public $description = 'Generate API docs from API classes';
+    public string $name = 'restapi:build-docs';
+    public string $description = 'Generate API docs from API classes';
 
     public function configure()
     {
@@ -40,7 +41,7 @@ class BuildDocsCommand extends \blink\core\console\Command
         $excludeApiPaths = $input->getOption('exclude-api-path');
         
         /** @var Manager $manager */
-        $manager = $this->blink->get('restapi');
+        $manager = Container::$global->get('restapi');
         if (! empty($apiPaths)) {
             $manager->apiPaths = $apiPaths;
         } 
