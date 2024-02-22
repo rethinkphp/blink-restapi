@@ -35,7 +35,7 @@ abstract class BaseApi implements ApiInterface
             $this->validateRequestBody($this->request);
         }
 
-        return $validatedParameters;
+        return [...$routeParameters, ...$validatedParameters];
     }
 //    {
 //
