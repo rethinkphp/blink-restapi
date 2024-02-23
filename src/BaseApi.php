@@ -37,10 +37,9 @@ abstract class BaseApi implements ApiInterface
 
         return [...$routeParameters, ...$validatedParameters];
     }
+
 //    {
 //
-//        $this->validateParameters($this->request);
-//        $this->validateRequestBody($this->request);
 //
 //
 //        if (config('app.env') !== 'prod') {
@@ -98,15 +97,23 @@ abstract class BaseApi implements ApiInterface
         }
     }
 
-
     /**
      * @param int $mode
      * @param string|array|object $schema
+     * @param bool $withSharedSchemas
      * @return array
      */
-    protected function parseSchema(int $mode, $schema): array
+    protected function parseSchema(int $mode, $schema, bool $withSharedSchemas = false): array
     {
-        return app()->get('restapi')->makeTypeParser($mode)->parse($schema);
+        /** @var TypeParser $parser */
+        $parser = app('restapi')->makeTypeParser($mode);
+
+        $result = $parser->parse($schema);
+        if ($withSharedSchemas) {
+            $result['components']['schemas'] = $parser->getSchemas();
+        }
+
+        return $result;
     }
 
     private function isMultipartFormDataRequest(Request $request)
