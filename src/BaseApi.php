@@ -121,7 +121,7 @@ abstract class BaseApi implements ApiInterface
         // possible value: multipart/form-data; boundary=------------------------f80f7f383827c25b
         $requestedContentType = $request->headers->first('content-type');
 
-        return strpos($requestedContentType, 'multipart/form-data') !== false;
+        return $requestedContentType && strpos($requestedContentType, 'multipart/form-data') !== false;
     }
 
     protected function defaultResponses()
