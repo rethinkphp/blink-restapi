@@ -116,6 +116,7 @@ ROUTES;
         $docs['info']['version'] = $version;
 
         $docs['components']['schemas'] = $segments['schemas'];
+        $docs['components']['securitySchemes'] = $segments['securitySchemes'];
         $docs['paths'] = $segments['paths'];
 
         return $docs;
