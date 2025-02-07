@@ -140,21 +140,42 @@ abstract class BaseApi implements ApiInterface
         $this->response->statusCode = 204;
     }
 
+    /**
+     * @param string $message
+     * @return never
+     * @throws HttpException
+     */
     protected function unauthorised($message = 'Unauthorised')
     {
         throw new HttpException(401, $message);
     }
 
+    /**
+     * @param string $message
+     * @return never
+     * @throws HttpException
+     */
     protected function badRequest($message = 'Bad request')
     {
         throw new HttpException(400, $message);
     }
 
+    /**
+     * @param string $message
+     * @return never
+     * @throws HttpException
+     */
     protected function forbid($message = 'Permission denied')
     {
         throw new HttpException(403, $message);
     }
 
+
+    /**
+     * @param string $message
+     * @return never
+     * @throws HttpException
+     */
     protected function notFound($message = 'Not Found')
     {
         throw new HttpException(404, $message);
