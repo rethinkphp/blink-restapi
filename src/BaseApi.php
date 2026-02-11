@@ -89,7 +89,7 @@ abstract class BaseApi implements ApiInterface
             return;
         }
 
-        $definition = $this->parseSchema(TypeParser::MODE_JSON_SCHEMA, $body);
+        $definition = $this->parseSchema(TypeParser::MODE_JSON_SCHEMA, $body, true);
 
         $validator = new TypeValidator();
         if (! $validator->validate($request->payload->all(), $definition)) {
