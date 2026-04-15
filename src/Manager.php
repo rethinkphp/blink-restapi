@@ -21,6 +21,8 @@ class Manager extends BaseObject
     public $routePath;
 
     public $typeParserFactory;
+    
+    protected TypeParser $typeParser;
 
     /**
      * Build the routes through the configured namespace and path.
@@ -96,9 +98,9 @@ ROUTES;
         $version = $version ?: '3.0';
         
         if ($version === '3.1') {
-            $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_OPEN_API_31 | TypeParser::MODE_REF_SCHEMA);
+            $parser = $this->typeParser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_OPEN_API_31 | TypeParser::MODE_REF_SCHEMA);
         } else {
-            $parser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_REF_SCHEMA);
+            $parser = $this->typeParser = $this->makeTypeParser(TypeParser::MODE_OPEN_API | TypeParser::MODE_REF_SCHEMA);
         }
 
         $generator = new DocGenerator($this->getApiClasses(), $parser);
@@ -149,6 +151,16 @@ ROUTES;
 
             return $path;
         }, $paths);
+    }
+
+    /**
+     * Returns the TypeParser currectly used.
+     * 
+     * @return TypeParser
+     */
+    public function getTypeParser(): TypeParser
+    {
+        return $this->typeParser;
     }
 
     /**
